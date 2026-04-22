@@ -1,0 +1,40 @@
+{
+  "tests": [
+    {
+      "name": "Register new user",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "register", "name": "Тест Юзер", "username": "testuser_pulse99", "email": "test_pulse99@example.com", "password": "secret123"},
+      "expectedStatus": 200,
+      "expectedBody": {"token": "string"},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Login with credentials",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "login", "login": "testuser_pulse99", "password": "secret123"},
+      "expectedStatus": 200,
+      "expectedBody": {"token": "string"},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Duplicate register returns 409",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "register", "name": "Тест Юзер", "username": "testuser_pulse99", "email": "test_pulse99@example.com", "password": "secret123"},
+      "expectedStatus": 409,
+      "expectedBody": {"error": "string"},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Wrong password returns 401",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "login", "login": "testuser_pulse99", "password": "wrongpass"},
+      "expectedStatus": 401,
+      "expectedBody": {"error": "string"},
+      "bodyMatcher": "partial"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
+import type { User } from "@/lib/api";
 
 const STATS = [
   { label: "Чатов", value: "47" },
@@ -16,10 +17,15 @@ const MEDIA = [
   "from-indigo-400 to-violet-500",
 ];
 
-export default function ProfilePanel() {
+interface Props {
+  user: User;
+  onLogout: () => void;
+}
+
+export default function ProfilePanel({ user, onLogout }: Props) {
   const [editing, setEditing] = useState(false);
-  const [name, setName] = useState("Вы");
-  const [status, setStatus] = useState("На связи 🚀");
+  const [name, setName] = useState(user.name);
+  const [status, setStatus] = useState(user.status || "На связи 🚀");
 
   return (
     <div className="flex flex-col h-full">
@@ -40,7 +46,7 @@ export default function ProfilePanel() {
         <div className="flex flex-col items-center gap-3 mb-6 animate-fade-in-up opacity-0" style={{ animationFillMode: "forwards" }}>
           <div className="relative">
             <div className="w-20 h-20 rounded-3xl gradient-blue flex items-center justify-center text-white text-2xl font-bold neon-glow animate-float">
-              ВЫ
+              {user.name.slice(0, 2).toUpperCase()}
             </div>
             <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl gradient-primary flex items-center justify-center text-white hover:scale-110 transition-transform">
               <Icon name="Camera" size={13} />
@@ -82,8 +88,8 @@ export default function ProfilePanel() {
         {/* Info */}
         <div className="glass rounded-2xl overflow-hidden mb-4 animate-fade-in-up opacity-0 delay-225" style={{ animationFillMode: "forwards" }}>
           {[
-            { icon: "Phone", label: "+7 900 000-00-00" },
-            { icon: "Mail", label: "you@pulse.app" },
+            { icon: "AtSign", label: `@${user.username}` },
+            { icon: "Mail", label: user.email },
             { icon: "MapPin", label: "Москва, Россия" },
           ].map((item, i) => (
             <div key={i} className={`flex items-center gap-3 px-4 py-3 ${i < 2 ? "border-b border-border/30" : ""}`}>
@@ -101,12 +107,21 @@ export default function ProfilePanel() {
             <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Медиафайлы</p>
             <button className="text-xs text-primary">Все</button>
           </div>
-          <div className="grid grid-cols-3 gap-1.5">
+          <div className="grid grid-cols-3 gap-1.5 mb-4">
             {MEDIA.map((gradient, i) => (
               <div key={i} className={`aspect-square rounded-xl bg-gradient-to-br ${gradient} opacity-60 hover:opacity-100 transition-opacity cursor-pointer`} />
             ))}
           </div>
         </div>
+
+        {/* Logout */}
+        <button
+          onClick={onLogout}
+          className="w-full py-2.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium hover:bg-red-500/20 transition-all flex items-center justify-center gap-2"
+        >
+          <Icon name="LogOut" size={15} />
+          Выйти из аккаунта
+        </button>
       </div>
     </div>
   );

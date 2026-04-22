@@ -36,7 +36,9 @@ const SETTINGS = [
   },
 ];
 
-export default function SettingsPanel() {
+interface Props { onLogout: () => void; }
+
+export default function SettingsPanel({ onLogout }: Props) {
   const [toggles, setToggles] = useState<Record<string, boolean>>({
     "Push-уведомления": true,
     "Звуки": true,
@@ -57,6 +59,7 @@ export default function SettingsPanel() {
               {section.items.map((item, ii) => (
                 <button
                   key={item.label}
+                  onClick={item.danger ? onLogout : undefined}
                   className={`w-full flex items-center gap-3 px-4 py-3 transition-all text-left hover:bg-white/5 ${ii < section.items.length - 1 ? "border-b border-border/30" : ""} ${item.danger ? "text-red-400" : "text-foreground"}`}
                 >
                   <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${item.danger ? "bg-red-500/10" : "bg-white/5"}`}>

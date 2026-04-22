@@ -8,6 +8,8 @@ import NotificationsPanel from "@/components/messenger/NotificationsPanel";
 import SettingsPanel from "@/components/messenger/SettingsPanel";
 import ProfilePanel from "@/components/messenger/ProfilePanel";
 import CallOverlay from "@/components/messenger/CallOverlay";
+import AuthScreen from "@/components/messenger/AuthScreen";
+import { getSession, clearSession, type User } from "@/lib/api";
 
 export type Tab = "chats" | "contacts" | "search" | "notifications" | "settings" | "profile";
 
@@ -42,10 +44,15 @@ const navItems = [
 ];
 
 export default function Index() {
+  const [currentUser, setCurrentUser] = useState<User | null>(() => getSession()?.user ?? null);
   const [activeTab, setActiveTab] = useState<Tab>("chats");
   const [selectedChat, setSelectedChat] = useState<Chat | null>(CHATS[0]);
   const [callActive, setCallActive] = useState(false);
   const [callContact, setCallContact] = useState<Chat | null>(null);
+
+  if (!currentUser) {
+    return <AuthScreen onAuth={setCurrentUser} />;
+  }
 
   const handleCall = (chat: Chat) => {
     setCallContact(chat);
@@ -55,6 +62,11 @@ export default function Index() {
   const handleEndCall = () => {
     setCallActive(false);
     setCallContact(null);
+  };
+
+  const handleLogout = () => {
+    clearSession();
+    setCurrentUser(null);
   };
 
   const totalUnread = CHATS.reduce((a, c) => a + c.unread, 0);
@@ -99,8 +111,9 @@ export default function Index() {
         <button
           onClick={() => setActiveTab("profile")}
           className={`w-10 h-10 rounded-2xl gradient-blue flex items-center justify-center text-white font-bold text-xs hover:scale-110 transition-transform ${activeTab === "profile" ? "ring-2 ring-primary/50" : ""}`}
+          title={currentUser.name}
         >
-          ВЫ
+          {currentUser.name.slice(0, 2).toUpperCase()}
         </button>
       </nav>
 
@@ -112,8 +125,8 @@ export default function Index() {
         {activeTab === "contacts" && <ContactsPanel />}
         {activeTab === "search" && <SearchPanel onSelectChat={(c) => { setSelectedChat(c); setActiveTab("chats"); }} />}
         {activeTab === "notifications" && <NotificationsPanel />}
-        {activeTab === "settings" && <SettingsPanel />}
-        {activeTab === "profile" && <ProfilePanel />}
+        {activeTab === "settings" && <SettingsPanel onLogout={handleLogout} />}
+        {activeTab === "profile" && <ProfilePanel user={currentUser} onLogout={handleLogout} />}
       </div>
 
       {/* Main Chat Area */}
